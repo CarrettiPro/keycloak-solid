@@ -18,33 +18,51 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.protocol.oidc.OIDCAdvancedConfigWrapper;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.representations.idm.ClientPolicyExecutorConfigurationRepresentation;
+import org.keycloak.representations.oidc.OIDCClientRepresentation;
 import org.keycloak.services.clientpolicy.ClientPolicyContext;
-import org.keycloak.services.clientpolicy.ClientPolicyEvent;
 import org.keycloak.services.clientpolicy.ClientPolicyException;
+import org.keycloak.services.clientpolicy.context.DynamicClientRegisterContext;
+import org.keycloak.services.clientpolicy.context.DynamicClientRegisteredContext;
 import org.keycloak.services.clientpolicy.context.PreAuthorizationRequestContext;
+import org.keycloak.services.clientpolicy.context.TokenResponseContext;
 import org.keycloak.services.clientpolicy.executor.ClientPolicyExecutorProvider;
 import org.keycloak.util.JsonSerialization;
 
-public class SolidClientRegistrationExecutor implements ClientPolicyExecutorProvider<ClientPolicyExecutorConfigurationRepresentation> {
+public class SolidOIDCExecutor implements ClientPolicyExecutorProvider<ClientPolicyExecutorConfigurationRepresentation> {
 
-    private final Logger LOG = Logger.getLogger(SolidClientRegistrationExecutor.class);
+    private final Logger LOG = Logger.getLogger(SolidOIDCExecutor.class);
 
     private final KeycloakSession session;
 
-    public SolidClientRegistrationExecutor(KeycloakSession session) {
+    public SolidOIDCExecutor(KeycloakSession session) {
         this.session = session;
     }
 
     @Override
     public void executeOnEvent(ClientPolicyContext context) throws ClientPolicyException {
-        if (context.getEvent() == ClientPolicyEvent.PRE_AUTHORIZATION_REQUEST) {
-            registerSolidClient((PreAuthorizationRequestContext) context);
+        switch (context.getEvent()) {
+            case PRE_AUTHORIZATION_REQUEST:
+                registerSolidClient((PreAuthorizationRequestContext) context);
+                break;
+            case REGISTER:
+                dynamicClientRegister((DynamicClientRegisterContext)context);
+                break;
+            case REGISTERED:
+                dynamicClientRegistered((DynamicClientRegisteredContext)context);
+                break;
+            case TOKEN_RESPONSE:
+                TokenResponseContext ctx = (TokenResponseContext) context;
+                setWebIDClaim(ctx);
+                setAudienceClaim(ctx);
+                bindIDToken(ctx);
+                break;
+
         }
     }
 
     @Override
     public String getProviderId() {
-        return SolidClientRegistrationExecutorFactory.PROVIDER_ID;
+        return SolidOIDCExecutorFactory.PROVIDER_ID;
     }
 
     private void registerSolidClient(PreAuthorizationRequestContext context) {
@@ -64,7 +82,7 @@ public class SolidClientRegistrationExecutor implements ClientPolicyExecutorProv
                     return;
                 }
 
-                SolidClientIDDocument doc = JsonSerialization.readValue(entity.getContent(), SolidClientIDDocument.class);
+                OIDCClientRepresentation doc = JsonSerialization.readValue(entity.getContent(), OIDCClientRepresentation.class);
 
                 LOG.debugv("Registering client {0}", clientId);
                 client = session.clients().addClient(realm, clientId);
@@ -81,13 +99,28 @@ public class SolidClientRegistrationExecutor implements ClientPolicyExecutorProv
                 config.setDPoPEnabled(true);
 
             } catch (IOException ex) {
-                LOG.warnv("Could not fetch client ID document from {0}", clientId);
+                LOG.warnv(ex, "Could not fetch client ID document from {0}", clientId);
             } catch (URISyntaxException ex) {
                 LOG.warnv("{0} is not a valid URI, ignoring", ex);
             }
         } else {
             LOG.debugv("Client {0} already exists, ignoring", clientId);
         }
+    }
+
+    private void dynamicClientRegistered(DynamicClientRegisteredContext context) {
+    }
+
+    private void dynamicClientRegister(DynamicClientRegisterContext context) {
+    }
+
+    private void setWebIDClaim(TokenResponseContext context) {
+    }
+
+    private void setAudienceClaim(TokenResponseContext context) {
+    }
+
+    private void bindIDToken(TokenResponseContext context) {
     }
 
 }

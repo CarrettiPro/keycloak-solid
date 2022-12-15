@@ -10,13 +10,13 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.clientpolicy.executor.ClientPolicyExecutorProvider;
 import org.keycloak.services.clientpolicy.executor.ClientPolicyExecutorProviderFactory;
 
-public class SolidClientRegistrationExecutorFactory implements ClientPolicyExecutorProviderFactory {
+public class SolidOIDCExecutorFactory implements ClientPolicyExecutorProviderFactory {
 
-    static final String PROVIDER_ID = "solid-client";
+    static final String PROVIDER_ID = "solid";
 
     @Override
     public ClientPolicyExecutorProvider create(KeycloakSession session) {
-        return new SolidClientRegistrationExecutor(session);
+        return new SolidOIDCExecutor(session);
     }
 
     @Override

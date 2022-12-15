@@ -1,2 +1,2 @@
-org.solidproject.keycloak.solid.SolidClientRegistrationExecutorFactory
+org.solidproject.keycloak.solid.SolidOIDCExecutorFactory
 
