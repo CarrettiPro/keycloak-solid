@@ -12,7 +12,7 @@ import org.keycloak.services.clientpolicy.executor.ClientPolicyExecutorProviderF
 
 public class SolidOIDCExecutorFactory implements ClientPolicyExecutorProviderFactory {
 
-    static final String PROVIDER_ID = "solid";
+    static final String PROVIDER_ID = "solid-oidc";
 
     @Override
     public ClientPolicyExecutorProvider create(KeycloakSession session) {

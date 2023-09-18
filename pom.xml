@@ -10,9 +10,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <keycloak.version>999-SNAPSHOT-solid</keycloak.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <keycloak.version>999.0.0-SNAPSHOT</keycloak.version>
     </properties>
 
     <dependencies>
@@ -41,5 +41,19 @@
             <type>jar</type>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>OSS Sonatype Snapshots Repository</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+         </repository>
+     </repositories>
 
 </project>
